@@ -141,10 +141,12 @@ public class PositionController
         // firstBigDecimal.compareTo(secondBigDecimal) == 0    // "=="  
         // firstBigDecimal.compareTo(secondBigDecimal) >= 0    // ">="
         
-        return new Output(BigDecimal.valueOf(diffNumberMA), 
-                          BigDecimal.valueOf(diffNumberMB), 
-                          outputMA.setScale(SCALE_OUTPUT, BigDecimal.ROUND_FLOOR), 
-                          outputMB.setScale(SCALE_OUTPUT, BigDecimal.ROUND_FLOOR));
+        return new Output(BigDecimal.valueOf(diffNumberMA),                         // Lagedifferenz Motor A
+                          BigDecimal.valueOf(diffNumberMB),                         // Lagedifferenz Motor B
+                          diffOutputMA,                                             // Reglerausgang zum Motor A
+                          diffOutputMB,                                             // Reglerausgang zum Motor B
+                          outputMA.setScale(SCALE_OUTPUT, BigDecimal.ROUND_FLOOR),  // Ausgang zum Motor A
+                          outputMB.setScale(SCALE_OUTPUT, BigDecimal.ROUND_FLOOR)); // Ausgang zum Motor B
     }
     
     
@@ -157,38 +159,60 @@ public class PositionController
     final class Output
     {
         /**
-         * BigDecimal diffValueMA
+         * BigDecimal diffValueMA - Differenz Lage Motor A (in Impulse)
          */
         private final BigDecimal diffValueMA;
         
         /**
-         * BigDecimal diffValueMB
+         * BigDecimal diffValueMB - Differenz Lage Motor B (in Impulse)
          */
         private final BigDecimal diffValueMB;
         
         /**
-         * BigDecimal outputMA
+         * diffOutputMA - Reglerausgang fuer Motor A
+         * <p>
+         * diffOutputMA ergibt sich aus Reglerverstaerkung (p_factor) mal diffValueMA
+         * </p>
+         */
+        private final BigDecimal diffOutputMA;
+
+        /**
+         * diffOutputMB - Reglerausgang fuer Motor B
+         * <p>
+         * diffOutputMB ergibt sich aus Reglerverstaerkung (p_factor) mal diffValueMB
+         * </p>
+         */
+        private final BigDecimal diffOutputMB;
+        
+        /**
+         * BigDecimal outputMA - Sollwert fuer Motor A
          */
         private final BigDecimal outputMA;
         
         /**
-         * BigDecimal outputMB
+         * BigDecimal outputMB - Sollwert fuer Motor B
          */
         private final BigDecimal outputMB; 
         
         /**
          * Output() - Konstruktor aus den Attributen...
-         * @param diffValue
-         * @param outputMA
-         * @param outputMB
+         * @param diffValueMA - Lagedifferenz Motor A
+         * @param diffValueMB - Lagedifferenz Motor B
+         * @param outputMA - Sollwert fuer Motor A
+         * @param outputMB - Solwert fuer Motor B
          */
         public Output(BigDecimal diffValueMA,
                       BigDecimal diffValueMB,
+                      BigDecimal diffOutputMA,
+                      BigDecimal diffOutputMB,
                       BigDecimal outputMA,      
                       BigDecimal outputMB)
         {
             this.diffValueMA = (diffValueMA != null)? diffValueMA : BigDecimal.ZERO.setScale(SCALE_OUTPUT);
             this.diffValueMB = (diffValueMB != null)? diffValueMB : BigDecimal.ZERO.setScale(SCALE_OUTPUT);
+            
+            this.diffOutputMA = (diffOutputMA != null)? diffOutputMA : BigDecimal.ZERO.setScale(SCALE_OUTPUT);
+            this.diffOutputMB = (diffOutputMB != null)? diffOutputMB : BigDecimal.ZERO.setScale(SCALE_OUTPUT);
             
             this.outputMA = (outputMA != null)? outputMA : BigDecimal.ZERO.setScale(SCALE_OUTPUT);
             this.outputMB = (outputMB != null)? outputMB : BigDecimal.ZERO.setScale(SCALE_OUTPUT);
@@ -211,11 +235,29 @@ public class PositionController
         }
 
         /**
+         * getDiffOutputMA() - Reglerausgang Motor A
+         * @return the diffOutputMA
+         */
+        public final BigDecimal getDiffOutputMA()
+        {
+            return this.diffOutputMA;
+        }
+
+        /**
+         * getDiffOutputMB() - Reglerausgang Motor B
+         * @return the diffOutputMB
+         */
+        public final BigDecimal getDiffOutputMB()
+        {
+            return this.diffOutputMB;
+        }
+
+        /**
          * @return the outputMA
          */
         public final BigDecimal getOutputMA()
         {
-            return outputMA;
+            return this.outputMA;
         }
 
         /**
@@ -223,7 +265,7 @@ public class PositionController
          */
         public final BigDecimal getOutputMB()
         {
-            return outputMB;
+            return this.outputMB;
         }
         
         /**
@@ -236,6 +278,10 @@ public class PositionController
                                       .append(this.diffValueMA.toString())
                                       .append(" ")
                                       .append(this.diffValueMB.toString())
+                                      .append(" ")
+                                      .append(this.diffOutputMA.toString())
+                                      .append(" ")
+                                      .append(this.diffOutputMB.toString())
                                       .append(" ")
                                       .append(this.outputMA.toString())
                                       .append(" ")

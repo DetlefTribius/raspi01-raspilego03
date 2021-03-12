@@ -993,7 +993,6 @@ public class Model
                                         // - numberMA (long)
                                         // - numberMB (long)
                                         
-                                        
                                         final PositionController.Output output = Model.this.getPositionController().doControl(Model.this.numberDestinationMA, Model.this.numberMA,
                                                                                                                               Model.this.numberDestinationMB, Model.this.numberMB,
                                                                                                                               Model.this.destinationOutputMA, 
